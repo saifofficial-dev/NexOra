@@ -213,10 +213,9 @@ export const ChatWidget = () => {
             whileTap={{ scale: 0.95 }}
             className={`
                 relative w-20 h-20 rounded-3xl flex items-center justify-center transition-all duration-500 
-                shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.1)]
                 ${isOpen 
-                    ? 'bg-white text-black' 
-                    : 'bg-[#1a1a1a] border-t border-white/20 text-white'
+                    ? 'bg-white text-black shadow-2xl' 
+                    : 'bg-transparent text-white'
                 }
             `}
             style={{
@@ -225,8 +224,6 @@ export const ChatWidget = () => {
             } as any}
             id="chat-toggle"
         >
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-            
             <AnimatePresence mode="wait">
             {isOpen ? (
                 <motion.div
@@ -246,26 +243,17 @@ export const ChatWidget = () => {
                     className="flex flex-col items-center justify-center w-full h-full"
                 >
                     {/* 3D Robotic Animation */}
-                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-3xl">
+                    <div className="relative w-20 h-20 flex items-center justify-center overflow-visible">
                         {React.createElement('dotlottie-wc', {
                             src: "https://lottie.host/c9fb5a79-2fb7-4ed2-bf74-20c84c6013e4/vZoAXODKYO.lottie",
                             autoplay: true,
                             loop: true,
-                            style: { width: '100%', height: '100%', transform: 'scale(1.5)' }
+                            style: { width: '120px', height: '120px', flexShrink: 0 }
                         })}
-                        <div className="absolute inset-0 bg-neon-cyan/5 blur-xl rounded-full pointer-events-none" />
                     </div>
                 </motion.div>
             )}
             </AnimatePresence>
-
-            {/* Glowing Ring Border Effect */}
-            {!isOpen && (
-                <div className="absolute inset-0 rounded-3xl border border-white/5 pointer-events-none">
-                    <div className="absolute inset-[-100%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_300deg,#06b6d4_360deg)] animate-[spin_6s_linear_infinite] opacity-30" />
-                    <div className="absolute inset-[1px] bg-[#1a1a1a]/40 rounded-[23px] backdrop-blur-[2px]" />
-                </div>
-            )}
         </motion.button>
       </div>
     </div>
