@@ -1,124 +1,64 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Code2, 
-  Cpu, 
-  Workflow, 
-  Smartphone, 
-  CheckCircle2, 
-  ArrowRight, 
-  Users, 
-  Clock, 
-  HeartHandshake,
-  Menu,
-  X,
-  Linkedin,
-  Github,
-  Instagram,
-  ChevronRight,
-  MessageSquare,
-  Globe,
-  Zap,
-  Star,
-  Quote,
-  Send,
-  Phone,
-  ArrowLeft
+  Menu, X, ArrowRight, Activity, 
+  Mic, AudioLines, Sparkles, Cpu, Link as LinkIcon, Lock, 
+  TerminalSquare, Play, Phone, Star, Quote, Bot, Zap, Globe, CheckCircle
 } from 'lucide-react';
+import { ChatWidget } from './components/ChatWidget';
 
 const WHATSAPP_NUMBER = "923265163629";
-const WHATSAPP_DISPLAY = "+92 326 5163629";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
-// --- Types ---
-type Service = {
-  id: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  icon: any;
-  packages: {
-    name: string;
-    usd: string;
-    pkr: string;
-    features: string[];
-  }[];
-  techStack: string[];
-};
-
-// --- Mock Data ---
-const SERVICES: Service[] = [
-  {
-    id: 'web-dev',
-    title: 'Web Engineering',
-    description: 'Custom, high-performance web applications built for scale.',
-    longDescription: 'We build scalable, secure, and blazingly fast web applications using enterprise-grade technologies like Next.js and React.',
-    icon: Code2,
-    techStack: ['Next.js', 'React', 'Node.js', 'Tailwind', 'PostgreSQL'],
-    packages: [
-      { name: 'Starter', usd: '$300', pkr: 'PKR 85,000', features: ['5-page site', 'Responsive', 'Basic SEO'] },
-      { name: 'Business', usd: '$800', pkr: 'PKR 2,25,000', features: ['10-page site', 'CMS', 'Contact forms', 'Animations'] },
-      { name: 'Enterprise', usd: '$2,000+', pkr: 'PKR 5,60,000+', features: ['Full web app', 'Auth', 'Database', 'API Integrations'] },
-    ]
-  },
-  {
-    id: 'automation',
-    title: 'Workflow Automation',
-    description: 'Business process automation and deep system integrations.',
-    longDescription: 'Automate repetitive tasks and streamline your operations with custom workflows connecting your entire tech stack.',
-    icon: Workflow,
-    techStack: ['n8n', 'Make', 'Zapier', 'Python', 'Webhooks'],
-    packages: [
-      { name: 'Basic Flow', usd: '$200', pkr: 'PKR 56,000', features: ['1–3 workflows', 'Basic triggers', 'Email alerts'] },
-      { name: 'Business Suite', usd: '$600', pkr: 'PKR 1,68,000', features: ['Up to 10 workflows', 'CRM integration', 'Monitoring'] },
-      { name: 'Enterprise', usd: '$1,500+', pkr: 'PKR 4,20,000+', features: ['Unlimited flows', 'Custom dashboards', '24/7 Monitoring'] },
-    ]
-  },
-  {
-    id: 'ai-agents',
-    title: 'AI Native Systems',
-    description: 'Custom AI chatbots and autonomous LLM-powered agents.',
-    longDescription: 'Leverage the power of Generative AI to create intelligent agents that handle support, scale sales, and analyze massive datasets.',
-    icon: Cpu,
-    techStack: ['OpenAI', 'Claude', 'LangChain', 'Python', 'Vector DBs'],
-    packages: [
-      { name: 'Basic Agent', usd: '$400', pkr: 'PKR 1,12,000', features: ['1 Chatbot', 'Single platform', 'Knowledge base'] },
-      { name: 'Multi-Agent', usd: '$1,200', pkr: 'PKR 3,36,000', features: ['3 Agents', 'RAG integration', 'API access'] },
-      { name: 'Enterprise AI', usd: '$3,000+', pkr: 'PKR 8,40,000+', features: ['Full AI system', 'Fine-tuning', 'Analytics'] },
-    ]
-  },
-  {
-    id: 'mobile-dev',
-    title: 'Mobile Applications',
-    description: 'Cross-platform and native mobile experiences.',
-    longDescription: 'Reach your customers on the go with high-quality, pixel-perfect iOS and Android applications.',
-    icon: Smartphone,
-    techStack: ['React Native', 'Flutter', 'Swift', 'Firebase'],
-    packages: [
-      { name: 'MVP App', usd: '$1,000', pkr: 'PKR 2,80,000', features: ['Core features', '2 platforms', 'Basic UI'] },
-      { name: 'Growth App', usd: '$2,500', pkr: 'PKR 7,00,000', features: ['Full features', 'Auth', 'Payments'] },
-      { name: 'Enterprise App', usd: '$5,000+', pkr: 'PKR 14,00,000+', features: ['Custom backend', 'Admin panel', 'Scaling'] },
-    ]
-  }
-];
-
-const CASE_STUDIES = [
-  { id: 1, title: 'Global Logistics Optimizer AI', category: 'AI Agents', desc: 'Dynamic routing agent reducing fleet fuel consumption by 18% annually.', image: 'https://images.unsplash.com/photo-1586528116311-ad8ed7c663e0?auto=format&fit=crop&w=1200&q=80', tech: ['Python', 'OpenAI', 'AWS'], client: 'LogisTech Global', timeline: '4 Months', challenge: 'The client faced soaring fuel costs and delayed deliveries due to manual, static routing across a fleet of 500+ vehicles. Changing traffic conditions and weather were causing constant supply chain bottlenecks.', solution: 'We developed an autonomous AI routing agent ingesting real-time traffic, weather, and fleet telemetry data to dynamically re-route vehicles. A custom LLM interface allows dispatchers to query logistics scenarios instantly.', results: ['18% reduction in annual fuel consumption', '2x faster routing generation', 'Saved $1.2M in operational costs in first year'] },
-  { id: 2, title: 'Fintech Neo-Bank Platform', category: 'Web & Mobile', desc: 'Secure, scalable banking portal handling $2M+ daily transactions.', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80', tech: ['React Native', 'Node.js', 'PostgreSQL'], client: 'Apex Finance', timeline: '8 Months', challenge: 'A legacy regional bank needed to transition an older demographic to a digital-first neo-banking platform without alienating them, while adhering to strict financial compliance standards.', solution: 'Engineered a highly secure, scalable architecture utilizing Node.js microservices and a pixel-perfect React Native mobile app. Integrated Plaid for banking connectivity and implemented zero-trust security measures.', results: ['Zero downtime during migration', '$2M+ daily transaction volume processed', '4.8/5 App Store rating'] },
-  { id: 3, title: 'Enterprise Support Automation', category: 'Automation', desc: 'Multi-channel ticketing automation resolving 40% of queries instantly.', image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80', tech: ['n8n', 'LangChain', 'Zendesk'], client: 'Luminex', timeline: '2 Months', challenge: 'The support team was overwhelmed managing 10,000+ monthly tickets across email, WhatsApp, and Intercom, resulting in a 48-hour average response time.', solution: 'Built an advanced n8n workflow connecting Zendesk with a specialized LLM via LangChain. The system automatically categorizes, prioritizes, and drafts responses for L1 support queries.', results: ['40% of tickets resolved autonomously', 'Average response time reduced to 5 mins', 'CSAT score increased by 35%'] },
-  { id: 4, title: 'Corporate Real Estate SaaS', category: 'Web Dev', desc: 'Property management dashboard serving 500+ commercial agents.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', tech: ['Next.js', 'PostgreSQL'], client: 'Crescent Holdings', timeline: '5 Months', challenge: 'Existing property management solutions were fragmented. The client needed a unified dashboard for brokers to track leads, manage high-value asset portfolios, and generate contracts.', solution: 'Developed a blazingly fast Next.js web application utilizing a robust PostgreSQL database. Created an interactive, real-time analytics dashboard and automated PDF contract generation.', results: ['Onboarded 500+ commercial agents', 'Reduced time-to-lease by 15 days', 'Centralized $500M+ in asset profiles'] },
-  { id: 5, title: 'Healthcare Patient Portal App', category: 'Mobile Dev', desc: 'HIPAA-compliant cross-platform booking and telemedicine app.', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80', tech: ['Flutter', 'Supabase'], client: 'Medix Health', timeline: '6 Months', challenge: 'Patients lacked a secure, easy-to-use platform for booking appointments, viewing test results, and consulting with doctors remotely.', solution: 'Created a HIPAA-compliant Flutter mobile app with Supabase providing secure authentication and real-time database capabilities. Integrated a WebRTC module for smooth telemedicine video calls.', results: ['80% patient adoption rate in 3 months', 'Reduced no-show appointments by 25%', 'Handled 5,000+ tele-consults in Q1'] },
-  { id: 6, title: 'Smart Retail Inventory AI', category: 'AI Agents', desc: 'Predictive inventory system reducing overstock by 25%.', image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1200&q=80', tech: ['LangChain', 'Pinecone'], client: 'StyleCart National', timeline: '3 Months', challenge: 'The retailer struggled with inventory fragmentation—popular items sold out quickly while dead stock accumulated, leading to heavy markdowns and lost revenue.', solution: 'Deployed a LangChain agent hooked up to a Pinecone vector database of historical sales data. The AI agent analyzes purchasing trends and automatically generates predictive restocking orders.', results: ['Reduced dead stock by 25%', 'Boosted peak-season revenue by 12%', 'Automated 70% of purchase orders'] },
+const USE_CASES = [
+  { id: 1, title: 'Custom AI Agents', desc: 'Secure, fine-tuned conversational agents built on localized RAG pipelines to handle your proprietary data.', tech: ['LangChain', 'OpenAI', 'Pinecone'], icon: Bot },
+  { id: 2, title: 'Workflow Automation', desc: 'Eliminate manual data entry. We connect your entire tech stack via intelligent triggers and robotic process automation.', tech: ['n8n', 'Make', 'Zapier'], icon: Zap },
+  { id: 3, title: 'Web & Mobile Engineering', desc: 'Scalable, blazingly fast full-stack applications wrapped in enterprise-grade infrastructure.', tech: ['Next.js', 'React Native', 'AWS / Supabase'], icon: Globe },
+  { id: 4, title: 'AI Voice Infrastructure', desc: 'Deploy low-latency voice bots for inbound triage and outbound sales directly integrated with your CRM.', tech: ['Twilio', 'Deepgram', 'Vapi'], icon: Mic }
 ];
 
 const TESTIMONIALS = [
   { name: 'Sarah Rodriguez', role: 'CEO, TaskFlow USA', country: '🇺🇸', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80', content: '"The mobile app they built has been a game-changer for our business. Clean UI, fast performance, and they handled the App Store submission seamlessly."', rating: 5 },
   { name: 'Ahmed Khan', role: 'Founder, StyleMart Pakistan', country: '🇵🇰', image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=200&q=80', content: '"Our e-commerce website went from idea to launch in 3 weeks. The design is stunning and performance is excellent. We\'ve seen a 40% increase in online sales."', rating: 5 },
-  { name: 'James Thompson', role: 'CTO, HealthLink UK', country: '🇬🇧', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80', content: '"NexOra Labs delivered our AI chatbot in 3 weeks flat. The quality exceeded our expectations — it handles 80% of our customer queries automatically. Incredible team."', rating: 5 },
-  { name: 'Muhammad Usman', role: 'MD, TechVentures Lahore', country: '🇵🇰', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80', content: '"Professional, responsive, and technically brilliant. NexOra Labs is our go-to tech partner for all projects. They consistently deliver beyond expectations."', rating: 5 },
+  { name: 'James Thompson', role: 'CTO, HealthLink UK', country: '🇬🇧', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80', content: '"NexOra Labs delivered our AI chatbot in 3 weeks flat. The quality exceeded our expectations — it handles 80% of our queries autonomously."', rating: 5 },
+  { name: 'Muhammad Usman', role: 'MD, TechVentures Lahore', country: '🇵🇰', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80', content: '"Professional, responsive, and technically brilliant. They are our go-to engineering partners for complex integrations."', rating: 5 },
 ];
 
-// --- Components ---
+
+const CASE_STUDIES = [
+  {
+    title: "Enterprise CRM AI Automation",
+    client: "Vanguard Tech Solutions",
+    description: "Automated a massive inbound lead pipeline, saving 40+ hours a week for the sales team.",
+    problem: "Sales representatives were spending 60% of their time manually categorizing inbound leads and entering data into Salesforce, leading to delayed follow-ups and lost revenue.",
+    solution: "We deployed a custom LLM-powered routing agent that ingests emails, extracts key entities using GPT-4, and automatically scores and routes leads directly into Salesforce.",
+    results: ["85% faster response time", "40+ hours saved weekly", "22% increase in conversion rate"]
+  },
+  {
+    title: "Real-Time Telehealth Voice Agent",
+    client: "CareConnect Health",
+    description: "Built a HIPAA-compliant voice bot for patient triage and appointment scheduling.",
+    problem: "Call centers were overwhelmed during peak hours, resulting in 30+ minute hold times and high patient drop-off rates.",
+    solution: "Engineered an ultra-low latency voice AI using Vapi, Deepgram, and our proprietary RAG pipeline to handle patient intake, answer FAQs, and book appointments securely.",
+    results: ["Zero hold times 24/7", "Over 10,000 appointments booked", "94% patient satisfaction score"]
+  },
+  {
+    title: "AI Logistics Optimizer",
+    client: "SwiftRoute Logistics",
+    description: "Dynamic route optimization reducing fuel costs and delivery times by 30%.",
+    problem: "Manual dispatching for 500+ vehicles was inefficient, leading to high fuel consumption and overlapping delivery routes.",
+    solution: "Implemented a custom AI orchestration layer that processes real-time traffic, weather, and shipment priorities to generate optimal dispatch paths.",
+    results: ["30% reduction in fuel costs", "15% faster deliveries", "Automated 90% of dispatching"]
+  },
+  {
+    title: "Synthentic Market Intelligence",
+    client: "Nexus Global Capital",
+    description: "Processing millions of news signals daily to predict market sentiment with 92% accuracy.",
+    problem: "Analysts were drowning in news data, making it impossible to capture real-time market shifts accurately.",
+    solution: "Built a distributed RAG system that monitors global financial signals and generates contextual sentiment reports for trading desks.",
+    results: ["92% sentiment accuracy", "Sub-second signal processing", "4x increase in analyst efficiency"]
+  }
+];
 
 const Navbar = ({ activePage, setActivePage }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,61 +70,53 @@ const Navbar = ({ activePage, setActivePage }: any) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'services', label: 'Services' },
-    { id: 'portfolio', label: 'Work' },
-    { id: 'about', label: 'About' },
-  ];
-
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md border-b border-border shadow-sm py-4' : 'bg-transparent py-6'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <div className="text-2xl font-display font-extrabold tracking-tighter cursor-pointer flex items-center gap-2" onClick={() => setActivePage('home')}>
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white">
-            <Zap size={18} />
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'glass border-b border-white/[0.05] py-4' : 'bg-transparent py-6'}`}>
+      <div className="container mx-auto px-6 flex justify-between items-center relative">
+        <div className="text-2xl font-display font-bold tracking-tighter cursor-pointer flex items-center gap-3 relative z-20" onClick={() => setActivePage('home')}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-purple p-[1px]">
+            <div className="w-full h-full bg-primary rounded-xl flex items-center justify-center">
+              <AudioLines size={20} className="text-white" />
+            </div>
           </div>
-          NexOra
+          <span className="text-white">NexOra <span className="text-neon-cyan">labs</span></span>
         </div>
 
-        <div className="hidden md:flex items-center gap-8">
-          {navItems.map(item => (
-            <button 
-              key={item.id}
-              onClick={() => setActivePage(item.id)}
-              className={`text-sm font-medium transition-colors ${activePage === item.id ? 'text-black font-semibold' : 'text-text-muted hover:text-black'}`}
-            >
-              {item.label}
-            </button>
-          ))}
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:scale-105 transition-transform flex items-center gap-2">
-            Let's Talk <ArrowRight size={16} />
+        <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
+          <div className="flex items-center gap-8 bg-white/[0.03] px-6 py-2 rounded-full border border-white/[0.05] pointer-events-auto backdrop-blur-md">
+            <button onClick={() => setActivePage('home')} className={`text-sm font-medium transition-colors ${activePage === 'home' ? 'text-white' : 'text-text-muted hover:text-white'}`}>Home</button>
+            <button onClick={() => setActivePage('use_cases')} className={`text-sm font-medium transition-colors ${activePage === 'use_cases' ? 'text-white' : 'text-text-muted hover:text-white'}`}>Services</button>
+            <button onClick={() => setActivePage('about')} className={`text-sm font-medium transition-colors ${activePage === 'about' ? 'text-white' : 'text-text-muted hover:text-white'}`}>About Us</button>
+          </div>
+        </div>
+
+        <div className="hidden md:flex relative z-20">
+          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+            Consult our Experts
           </a>
         </div>
 
-        <button className="md:hidden text-black" onClick={() => setIsOpen(!isOpen)}>
+        <button className="md:hidden text-white relative z-20" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X /> : <Menu />}
         </button>
       </div>
-
+      
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 w-full bg-white border-b border-border p-6 flex flex-col gap-4 shadow-xl"
+            className="absolute top-full left-0 w-full bg-secondary border-b border-white/5 p-6 flex flex-col gap-4 shadow-2xl z-10"
           >
-            {navItems.map(item => (
+            {['home', 'use_cases', 'about'].map(item => (
               <button 
-                key={item.id}
-                onClick={() => { setActivePage(item.id); setIsOpen(false); }}
-                className={`text-left text-lg font-medium p-2 rounded-lg ${activePage === item.id ? 'bg-gray-100 text-black' : 'text-text-muted'}`}
+                key={item}
+                onClick={() => { setActivePage(item); setIsOpen(false); }}
+                className={`text-left text-lg font-medium p-2 rounded-lg ${activePage === item ? 'bg-white/5 text-white' : 'text-text-muted'}`}
               >
-                {item.label}
+                {item.replace('_', ' ').charAt(0).toUpperCase() + item.replace('_', ' ').slice(1)}
               </button>
             ))}
-            <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-black text-white text-center p-3 rounded-lg font-medium mt-2">
-              Book a Call
-            </a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -192,149 +124,318 @@ const Navbar = ({ activePage, setActivePage }: any) => {
   );
 };
 
-const HeroSection = ({ setActivePage }: any) => (
-  <section className="min-h-screen pt-40 pb-20 flex items-center relative overflow-hidden bg-white">
-    <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
-      <div className="relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-border mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-mono font-medium text-black uppercase tracking-wider">Available for new projects</span>
-        </motion.div>
-        
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="text-6xl md:text-7xl lg:text-8xl font-display font-extrabold leading-[1.05] tracking-tighter mb-6 text-black">
-          Digital <br />
-          <span className="text-text-muted italic">Infrastructure</span> <br />
-          For Scale.
-        </motion.h1>
-        
-        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="text-xl md:text-2xl text-text-muted mb-10 max-w-xl leading-relaxed">
-          An elite AI and Web Engineering agency crafting industry-defining platforms for ambitious businesses globally.
-        </motion.p>
-        
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex flex-wrap gap-4">
-          <button onClick={() => setActivePage('services')} className="group bg-black text-white px-8 py-4 rounded-full font-semibold flex items-center gap-2 hover:scale-105 transition-all">
-            Explore Services <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="group bg-white border border-border text-black px-8 py-4 rounded-full font-semibold flex items-center gap-2 hover:bg-gray-50 transition-all">
-            Contact Us <Phone className="w-4 h-4" />
-          </a>
-        </motion.div>
+const PageLoader = () => (
+  <motion.div 
+    key="loader"
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }} 
+    exit={{ opacity: 0 }} 
+    className="pt-40 pb-32 min-h-[80vh] flex flex-col items-center justify-center relative overflow-hidden"
+  >
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-neon-purple glow-bg opacity-10"></div>
+    
+    <div className="relative z-10 flex flex-col items-center">
+      {/* Mini loading orb / soundwave */}
+      <div className="flex items-center justify-center gap-1.5 h-12 w-12 mb-6">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="w-1.5 rounded-full bg-gradient-to-t from-neon-blue to-neon-purple animate-wave opacity-90" style={{ animationDelay: `${i * 0.15}s` }}></div>
+        ))}
       </div>
+      
+      <div className="text-sm font-mono tracking-widest text-neon-cyan animate-pulse mb-6">SYNTHESIZING CONTEXT...</div>
 
-      <motion.div
-           initial={{ opacity: 0, scale: 0.95 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ duration: 1, delay: 0.2 }}
-           className="relative hidden lg:block h-full min-h-[600px] perspective-1000"
-        >
-            <div className="absolute inset-0 z-10 rounded-[2rem] overflow-hidden border border-border premium-shadow group preserve-3d transition-transform duration-700 ease-out hover:rotate-y-12">
-                <img 
-                    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Code on screen" 
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                    referrerPolicy="no-referrer"
-                />
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                
-                <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-20">
-                    <div className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                    </div>
-                </div>
-                
-                <div className="absolute bottom-8 left-8 right-8 z-20 transition-transform duration-500 group-hover:-translate-y-2">
-                    <div className="glass-dark rounded-2xl p-6 flex flex-col gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                                 <Cpu className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                                <div className="text-xs font-mono text-white/50 mb-1">SYSTEM.STATUS</div>
-                                <div className="font-bold text-sm tracking-wide text-white">LLM Agents Online</div>
-                            </div>
-                        </div>
-                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div className="h-full bg-white" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 2, repeat: Infinity }} />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </motion.div>
+      {/* Animated Data Progress Bar */}
+      <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+        <motion.div 
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="h-full bg-gradient-to-r from-neon-blue via-neon-cyan to-neon-purple"
+        />
+      </div>
     </div>
-  </section>
+  </motion.div>
 );
 
-const StatsBar = () => (
-  <div className="border-y border-border bg-white py-12">
-    <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-      {[
-        { val: '50+', label: 'Projects Delivered' },
-        { val: '10+', label: 'Countries Reached' },
-        { val: '99%', label: 'Client Satisfaction' },
-        { val: '24/7', label: 'Active Support' },
-      ].map((stat, i) => (
-        <div key={i} className="text-center">
-          <div className="text-4xl md:text-5xl font-display font-extrabold text-black mb-2">{stat.val}</div>
-          <div className="text-sm font-medium text-text-muted uppercase tracking-widest">{stat.label}</div>
-        </div>
-      ))}
+const VoiceOrb = () => (
+  <div className="relative flex items-center justify-center w-64 h-64 md:w-96 md:h-96">
+    <div className="absolute inset-0 bg-neon-purple glow-bg opacity-40 animate-pulse"></div>
+    <div className="absolute inset-4 bg-neon-blue glow-bg opacity-30 animate-ping"></div>
+    
+    <div className="w-56 h-56 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-white/[0.1] to-white/[0.02] border border-white/20 backdrop-blur-xl flex items-center justify-center relative overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.3)]">
+      
+      {/* Inner dark core */}
+      <div className="absolute inset-2 md:inset-4 rounded-full bg-secondary/80 flex items-center justify-center border border-white/5 shadow-inner">
+         {/* Soundwaves */}
+         <div className="flex items-center justify-center gap-1.5 md:gap-2 h-16 md:h-24 w-full">
+           {[...Array(7)].map((_, i) => (
+             <div key={i} className="w-1.5 md:w-2 rounded-full bg-gradient-to-t from-neon-blue to-neon-cyan animate-wave opacity-80"></div>
+           ))}
+         </div>
+      </div>
+      
+      {/* Glossy overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full opacity-30"></div>
     </div>
   </div>
 );
 
-const HomeServices = ({ setActivePage }: any) => (
-  <section className="py-32 bg-secondary">
-    <div className="container mx-auto px-6">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-        <div className="max-w-2xl">
-          <h2 className="text-5xl md:text-6xl font-display font-extrabold tracking-tighter mb-6">Capabilities</h2>
-          <p className="text-xl text-text-muted leading-relaxed">End-to-end engineering mapped to your growth trajectory. We don't just build software, we architect businesses.</p>
-        </div>
-        <button onClick={() => setActivePage('services')} className="group flex items-center gap-2 font-bold text-black border-b border-black pb-1 hover:pr-4 transition-all">
-          View Detailed Packages <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-        </button>
+const HeroSection = () => (
+  <section className="min-h-screen relative overflow-hidden flex items-center pt-32 pb-20">
+    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-neon-purple glow-bg translate-x-1/3 -translate-y-1/3"></div>
+    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-neon-blue glow-bg -translate-x-1/3 translate-y-1/3"></div>
+
+    <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] border border-white/10 mb-8 backdrop-blur-md">
+           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+           <span className="text-xs font-medium text-white tracking-wider">Available for New Projects</span>
+        </motion.div>
+        
+        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-8 leading-[1.05]">
+          AI Solutions for <br />
+          <span className="text-neon-gradient">Ambitious Firms.</span>
+        </motion.h1>
+        
+        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xl text-text-muted mb-10 max-w-xl leading-relaxed">
+          We engineer bespoke AI agents, workflow automations, and scalable web platforms designed to 10x your operational speed.
+        </motion.p>
+        
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-wrap gap-4">
+          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-white text-black px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+            Consult an Engineer <ArrowRight className="w-5 h-5" />
+          </a>
+          <button className="bg-white/[0.05] border border-white/10 text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-white/[0.1] transition-colors backdrop-blur-md">
+             View Our Services
+          </button>
+        </motion.div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {SERVICES.map((s, i) => (
-          <div key={i} className="bg-white border border-border rounded-[2rem] p-8 card-hover flex flex-col items-start cursor-pointer group" onClick={() => setActivePage('services')}>
-            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-black mb-6 group-hover:scale-110 transition-transform">
-              <s.icon strokeWidth={1.5} size={28} />
-            </div>
-            <h3 className="text-2xl font-bold mb-3">{s.title}</h3>
-            <p className="text-text-muted mb-8 leading-relaxed">{s.description}</p>
-            <div className="mt-auto flex flex-wrap gap-2">
-              {s.techStack.slice(0,2).map(t => <span key={t} className="text-[10px] font-mono bg-gray-100 text-black px-2 py-1 rounded">{t}</span>)}
-            </div>
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, duration: 1 }} className="flex justify-center relative">
+        <VoiceOrb />
+        
+        {/* Floating Stat Cards near the orb */}
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute -left-4 md:-left-12 top-1/4 glass-card p-4 rounded-2xl z-20">
+          <div className="text-[10px] text-text-muted mb-1 font-mono tracking-wider">LLM MODELS</div>
+          <div className="text-lg md:text-xl font-bold text-white flex items-center gap-2"><Cpu size={18} className="text-neon-blue"/> GPT-4 & Claude 3</div>
+        </motion.div>
+
+        <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute -right-4 md:-right-8 bottom-1/4 glass-card p-4 rounded-2xl z-20">
+          <div className="text-[10px] text-text-muted mb-1 font-mono tracking-wider">ARCHITECTURE</div>
+          <div className="text-lg md:text-xl font-bold text-white flex items-center gap-2"><Sparkles size={18} className="text-neon-purple"/> Scalable Edge</div>
+        </motion.div>
+      </motion.div>
+    </div>
+  </section>
+);
+
+const FeaturesGrid = () => (
+  <section className="py-32 relative">
+    <div className="container mx-auto px-6 relative z-10">
+      <div className="mb-20">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tighter">Engineered for <br/> <span className="text-gradient">Real Business Impact.</span></h2>
+        <p className="text-xl text-text-muted max-w-2xl">Stop relying on fragmented agencies. We provide end-to-end technical execution—from data ingestion to user interface.</p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="glass-card rounded-[2rem] p-10 md:col-span-2 relative overflow-hidden group">
+          <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-neon-blue glow-bg group-hover:opacity-60 transition-opacity opacity-20"></div>
+          <TerminalSquare className="w-12 h-12 mb-8 text-neon-blue" />
+          <h3 className="text-3xl font-bold mb-4">Architecture & Strategy</h3>
+          <p className="text-text-muted max-w-md text-lg">We map out your manual constraints and design an unshakeable, future-proof technical architecture utilizing native APIs and cloud computing.</p>
+        </div>
+        
+        <div className="glass-card rounded-[2rem] p-10 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+              <Lock className="w-12 h-12 mb-8 text-neon-cyan" />
+              <h3 className="text-2xl font-bold mb-4">Enterprise Security</h3>
           </div>
-        ))}
+          <p className="text-text-muted text-lg">SOC2 standards. Data remains encrypted on entirely isolated server blocks.</p>
+        </div>
+
+        <div className="glass-card rounded-[2rem] p-10 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+             <Cpu className="w-12 h-12 mb-8 text-neon-purple" />
+             <h3 className="text-2xl font-bold mb-4">LLM Integration</h3>
+          </div>
+          <p className="text-text-muted text-lg">Proprietary logic wiring utilizing GPT-4, Claude, or fine-tuned open-weight models.</p>
+        </div>
+
+        <div className="glass-card rounded-[2rem] p-10 md:col-span-2 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 w-64 h-64 bg-neon-purple glow-bg opacity-10 group-hover:opacity-40 transition-opacity"></div>
+          <LinkIcon className="w-12 h-12 mb-8 text-white" />
+          <h3 className="text-3xl font-bold mb-4">Deep Software Engineering</h3>
+          <p className="text-text-muted max-w-md text-lg">Whether it's an internal React dashboard or a consumer-facing Next.js platform, we push robust, scalable, componentized code.</p>
+        </div>
       </div>
     </div>
   </section>
 );
 
-const Testimonials = () => (
-  <section className="py-32 bg-white border-t border-border">
-    <div className="container mx-auto px-6">
-      <h2 className="text-5xl font-display font-extrabold tracking-tighter text-center mb-20">What Clients Say</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+const UseCasesScroll = () => {
+    return (
+        <section className="py-20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/[0.01]"></div>
+            <div className="container mx-auto px-6 relative z-10">
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <h2 className="text-5xl lg:text-7xl font-bold tracking-tighter mb-6">Our <span className="text-neon-gradient">Capabilities.</span></h2>
+                    <p className="text-xl text-text-muted">From deep automation integration to robust mobile app builds, our engineers map solutions directly to your growth trajectory.</p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                    {USE_CASES.map((uc, i) => {
+                        const Icon = uc.icon;
+                        return (
+                        <div key={i} className="glass-card p-10 rounded-3xl group cursor-pointer hover:-translate-y-1 transition-transform relative overflow-hidden">
+                            <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-neon-cyan glow-bg opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+                            <div className="flex justify-between items-start mb-6 relative z-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-blue/20 group-hover:scale-110 transition-all duration-500 shrink-0">
+                                       <Icon size={28} className="text-neon-cyan group-hover:text-neon-blue transition-colors group-hover:animate-pulse" />
+                                    </div>
+                                    <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-neon-blue transition-colors pr-4">{uc.title}</h3>
+                                </div>
+                                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-neon-blue/20 transition-colors shrink-0 mt-1 md:mt-0 hidden sm:flex">
+                                    <ArrowRight size={20} className="text-white group-hover:translate-x-1 transition-transform"/>
+                                </div>
+                            </div>
+                            <p className="text-text-muted mb-10 text-lg leading-relaxed relative z-10">{uc.desc}</p>
+                            <div className="flex flex-wrap gap-2 relative z-10">
+                                {uc.tech.map(t => (
+                                    <span key={t} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-mono text-white/70 tracking-wide">{t}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )})}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+const CaseStudiesSection = () => {
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="py-32 relative overflow-hidden">
+      <div className="absolute left-0 top-1/2 w-[800px] h-[800px] bg-neon-cyan glow-bg -translate-y-1/2 opacity-10"></div>
+      
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="max-w-2xl">
+            <h2 className="text-5xl lg:text-7xl font-bold tracking-tighter mb-6">Execution <span className="text-neon-gradient">Excellence.</span></h2>
+            <p className="text-xl text-text-muted">A closer look at how we deploy robust engineering to solve complex operational bottlenecks.</p>
+          </div>
+          
+          <div className="flex gap-4">
+            <button 
+              onClick={() => scroll('left')}
+              className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/5 transition-colors cursor-pointer group"
+            >
+              <ArrowRight className="w-6 h-6 rotate-180 group-hover:-translate-x-1 transition-transform" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer group shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            >
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-8 pb-12 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {CASE_STUDIES.map((study, i) => (
+            <div 
+              key={i} 
+              className="min-w-[90%] md:min-w-[600px] lg:min-w-[800px] snap-center"
+            >
+              <div className="glass-card p-8 md:p-12 rounded-[2.5rem] relative flex flex-col h-full border border-white/5 shadow-2xl">
+                <div className="absolute top-0 right-0 p-8 md:p-12 opacity-20">
+                  <Activity size={48} className="text-neon-cyan" />
+                </div>
+                
+                <div className="mb-10">
+                  <p className="text-neon-cyan font-mono text-xs tracking-widest uppercase mb-4">{study.client}</p>
+                  <h3 className="text-3xl md:text-5xl font-bold text-white mb-6 pr-12 leading-[1.1]">{study.title}</h3>
+                  <p className="text-xl text-text-muted italic border-l-2 border-white/10 pl-6 py-1 leading-relaxed">"{study.description}"</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mt-auto">
+                  <div className="space-y-6">
+                    <div className="bg-white/[0.02] p-6 rounded-2xl border border-white/[0.05]">
+                      <h4 className="text-white font-bold mb-3 flex items-center gap-2 tracking-wide uppercase text-[10px] sm:text-xs">
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div> 
+                          The Problem
+                      </h4>
+                      <p className="text-white/70 text-sm leading-relaxed">{study.problem}</p>
+                    </div>
+                    <div className="bg-white/[0.02] p-6 rounded-2xl border border-white/[0.05]">
+                      <h4 className="text-white font-bold mb-3 flex items-center gap-2 tracking-wide uppercase text-[10px] sm:text-xs">
+                          <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(6,182,212,0.8)]"></div> 
+                          The Solution
+                      </h4>
+                      <p className="text-white/70 text-sm leading-relaxed">{study.solution}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/[0.03] p-8 rounded-3xl border border-white/[0.05] flex flex-col justify-center">
+                    <h4 className="text-white font-bold mb-6 flex items-center gap-2 tracking-wide uppercase text-[10px] sm:text-xs">
+                        <div className="w-1.5 h-1.5 rounded-full bg-neon-purple shadow-[0_0_8px_rgba(139,92,246,0.8)]"></div> 
+                        Measurable Results
+                    </h4>
+                    <ul className="space-y-4">
+                      {study.results.map((res, idx) => (
+                        <li key={idx} className="flex items-center gap-4 text-base text-text-muted">
+                          <div className="w-8 h-8 rounded-full bg-neon-purple/20 flex items-center justify-center shrink-0">
+                            <CheckCircle size={18} className="text-neon-purple" />
+                          </div>
+                          <span className="text-white/90 font-medium">{res}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const TestimonialsSection = () => (
+  <section className="py-32 relative overflow-hidden">
+    <div className="absolute right-0 top-1/2 w-[800px] h-[800px] bg-neon-blue glow-bg -translate-y-1/2 opacity-20"></div>
+    <div className="container mx-auto px-6 relative z-10">
+      <h2 className="text-5xl lg:text-6xl font-bold tracking-tighter text-center mb-20">Don't just take <br/><span className="text-gradient">our word for it.</span></h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {TESTIMONIALS.map((t, i) => (
-          <div key={i} className="bg-white border border-border p-8 rounded-3xl relative card-hover">
-            <Quote className="absolute top-8 right-8 text-gray-200" size={40} />
-            <div className="flex items-center gap-4 mb-6">
-              <img src={t.image} alt={t.name} className="w-16 h-16 rounded-full object-cover border border-border" referrerPolicy="no-referrer" />
+          <div key={i} className="glass-card p-8 rounded-3xl relative">
+            <Quote className="absolute top-8 right-8 text-white/5" size={40} />
+            <div className="flex items-center gap-4 mb-8">
+              <img src={t.image} alt={t.name} className="w-14 h-14 rounded-full object-cover border border-white/10" referrerPolicy="no-referrer" />
               <div>
-                 <h4 className="font-bold text-lg">{t.name}</h4>
-                 <p className="text-sm text-text-muted">{t.role} {t.country}</p>
+                 <h4 className="font-bold text-white">{t.name}</h4>
+                 <p className="text-xs tracking-wider text-text-muted uppercase mt-0.5">{t.role}</p>
               </div>
             </div>
             <div className="flex gap-1 mb-6">
-              {[...Array(t.rating)].map((_, idx) => <Star key={idx} size={16} className="fill-black text-black" />)}
+              {[...Array(t.rating)].map((_, idx) => <Star key={idx} size={14} className="fill-neon-purple text-neon-purple" />)}
             </div>
-            <p className="text-lg leading-relaxed text-black font-medium">{t.content}</p>
+            <p className="text-base leading-relaxed text-white/80">{t.content}</p>
           </div>
         ))}
       </div>
@@ -342,496 +443,69 @@ const Testimonials = () => (
   </section>
 );
 
-const ProcessSection = () => (
-  <section className="py-32 bg-white">
-    <div className="container mx-auto px-6">
-      <div className="text-center max-w-3xl mx-auto mb-20">
-        <h2 className="text-5xl font-display font-extrabold tracking-tighter mb-6">How We Build</h2>
-        <p className="text-xl text-text-muted">A streamlined, transparent process designed for speed and quality.</p>
-      </div>
-      <div className="grid md:grid-cols-4 gap-12 relative">
-        <div className="hidden md:block absolute top-12 left-0 w-full h-[1px] bg-border z-0" />
-        {[
-          { icon: MessageSquare, title: '1. Discovery', desc: 'Deep dive into your business goals and technical requirements.' },
-          { icon: Workflow, title: '2. Architecture', desc: 'System design, database modeling, and technical planning.' },
-          { icon: Code2, title: '3. Execution', desc: 'Agile development with weekly sprints and transparent updates.' },
-          { icon: Zap, title: '4. Deployment', desc: 'Rigorous testing followed by seamless production launch.' },
-        ].map((step, idx) => (
-          <div key={idx} className="relative z-10 flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-white border-2 border-black rounded-full flex items-center justify-center text-black mb-8 shadow-xl">
-              <step.icon size={32} />
-            </div>
-            <h4 className="text-2xl font-bold mb-4">{step.title}</h4>
-            <p className="text-text-muted leading-relaxed">{step.desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-const HomePage = ({ setActivePage }: any) => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-    <HeroSection setActivePage={setActivePage} />
-    <StatsBar />
-    <HomeServices setActivePage={setActivePage} />
-    
-    <section className="py-32 bg-white border-t border-border">
-      <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-        <div className="lg:w-1/2">
-          <h2 className="text-5xl font-display font-extrabold tracking-tighter mb-6">Why Choose NexOra?</h2>
-          <p className="text-xl text-text-muted mb-12">We combine Silicon Valley engineering standards with disruptive execution speed. Your dedicated technical partners.</p>
-          <div className="space-y-8">
-            {[
-              { icon: Users, title: 'Elite Talent', desc: 'Vetted engineers with deep expertise in modern tech stacks.' },
-              { icon: Clock, title: 'Rapid Execution', desc: 'Ship functional products in weeks, not months.' },
-              { icon: HeartHandshake, title: 'Strategic Partner', desc: 'We don\'t just build, we advise on scalable architecture and ROI.' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex gap-6">
-                <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-2xl flex items-center justify-center text-black border border-border">
-                  <item.icon />
-                </div>
-                <div>
-                  <h4 className="font-bold text-xl mb-2">{item.title}</h4>
-                  <p className="text-text-muted leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="lg:w-1/2 relative w-full h-[600px]">
-          <div className="grid grid-cols-2 gap-4 h-full">
-            <div className="pt-12">
-              <div className="h-full rounded-3xl border border-border p-8 flex flex-col justify-end relative overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700 grayscale" referrerPolicy="no-referrer" alt="Data" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <h4 className="text-2xl font-display font-bold relative z-10 text-white">Data Driven</h4>
-                <p className="text-sm font-medium text-gray-300 relative z-10 mt-2">Precision Analytics</p>
-              </div>
-            </div>
-            <div>
-              <div className="h-full bg-black rounded-3xl p-8 flex flex-col justify-end text-white relative overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=600&q=80" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700 mix-blend-overlay grayscale" referrerPolicy="no-referrer" alt="AI" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
-                <h4 className="text-2xl font-display font-bold relative z-10 text-white">AI Native</h4>
-                <p className="text-sm font-medium text-gray-300 relative z-10 mt-2">LLM Specialists</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <ProcessSection />
-    <Testimonials />
-
-    <section className="py-32 container mx-auto px-6">
-      <div className="bg-black rounded-[3rem] p-12 lg:p-24 text-center overflow-hidden relative shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 blur-[100px] rounded-full" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 blur-[100px] rounded-full" />
-        <h2 className="text-5xl lg:text-7xl font-display font-extrabold text-white mb-8 tracking-tighter relative z-10">Start Building<br />What's Next.</h2>
-        <p className="text-gray-300 max-w-2xl mx-auto mb-12 text-xl relative z-10">Stop thinking about "What if". Book your free consultation call today and let's architect your vision.</p>
-        <div className="flex flex-wrap justify-center gap-6 relative z-10">
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-white text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform flex items-center gap-2 shadow-xl">
-            Let's Talk <ArrowRight size={20} />
-          </a>
-          <button onClick={() => setActivePage('services')} className="bg-white/10 text-white px-10 py-5 rounded-full font-bold text-lg border border-white/20 hover:bg-white/20 transition-colors backdrop-blur-md">
-            View Pricing
-          </button>
-        </div>
-      </div>
-    </section>
-  </motion.div>
-);
-
-const ServicesPage = () => {
-  const [selectedService, setSelectedService] = useState<Service>(SERVICES[0]);
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-40 pb-32 bg-secondary/50 min-h-screen">
-      <div className="container mx-auto px-6">
-        <div className="mb-20 max-w-3xl">
-          <h1 className="text-6xl lg:text-8xl font-display font-extrabold tracking-tighter mb-8 text-black">Our <br /><span className="text-text-muted italic">Expertise</span></h1>
-          <p className="text-text-muted text-2xl leading-relaxed">Detailed packages and technical capabilities across our primary domains. Select a tier that matches your current scale.</p>
-        </div>
-
-        <div className="grid lg:grid-cols-12 gap-12 mb-24">
-          <div className="lg:col-span-4 flex flex-col gap-4">
-            {SERVICES.map(s => (
-              <button
-                key={s.id}
-                onClick={() => setSelectedService(s)}
-                className={`w-full text-left p-6 rounded-3xl border transition-all duration-300 flex items-center justify-between group ${selectedService.id === s.id ? 'bg-black border-black text-white shadow-2xl' : 'bg-white border-border text-black hover:border-black/30'}`}
-              >
-                <div className="flex items-center gap-4">
-                  <s.icon className={selectedService.id === s.id ? 'text-white' : 'text-black'} size={24} />
-                  <span className="font-bold text-lg">{s.title}</span>
-                </div>
-                <ChevronRight className={`w-5 h-5 transition-transform ${selectedService.id === s.id ? 'translate-x-0 text-white' : '-translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0'}`} />
-              </button>
-            ))}
-          </div>
-          
-          <div className="lg:col-span-8 bg-white border border-border rounded-[3rem] p-8 lg:p-14 relative overflow-hidden shadow-xl">
-            <div className="h-64 mb-10 rounded-2xl overflow-hidden relative border border-border hidden md:block">
-              <img 
-                src={
-                  selectedService.id === 'web-dev' ? 'https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=1200&q=80' : 
-                  selectedService.id === 'automation' ? 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80' :
-                  selectedService.id === 'ai-agents' ? 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=80' :
-                  'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80'
-                } 
-                alt={selectedService.title}
-                className="w-full h-full object-cover grayscale opacity-90 transition-transform duration-1000 hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <h2 className="absolute bottom-8 left-8 text-5xl font-display font-extrabold tracking-tighter flex items-center gap-4 text-white">
-                <selectedService.icon size={48} className="text-white" />
-                {selectedService.title}
-              </h2>
-            </div>
-
-            <h2 className="text-4xl font-display font-bold tracking-tighter mb-6 flex items-center gap-4 md:hidden text-black">
-              <selectedService.icon size={32} className="text-black" />
-              {selectedService.title}
-            </h2>
-
-            <p className="text-text-muted mb-16 text-xl leading-relaxed max-w-3xl">{selectedService.longDescription}</p>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              {selectedService.packages.map((pkg, idx) => (
-                <div key={idx} className="bg-secondary border border-border rounded-3xl p-8 hover:border-black transition-colors group">
-                  <div className="text-xs font-mono font-bold uppercase mb-4 tracking-wider text-text-muted">{pkg.name}</div>
-                  <div className="text-4xl font-display font-bold mb-2 text-black">{pkg.usd}</div>
-                  <div className="text-[11px] font-medium text-text-muted uppercase tracking-widest mb-8">{pkg.pkr}</div>
-                  <div className="w-full h-[1px] bg-border mb-8 group-hover:bg-black/10 transition-colors" />
-                  <ul className="space-y-4">
-                    {pkg.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm font-medium">
-                        <CheckCircle2 size={18} className="text-black shrink-0 mt-0.5" />
-                        <span className="text-text-main">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="w-full mt-10 border border-black text-black py-3 rounded-full font-bold hover:bg-black hover:text-white transition-colors text-sm flex justify-center">
-                    Select Plan
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const PortfolioPage = () => {
-  const [selectedStudy, setSelectedStudy] = useState<any>(null);
-
-  if (selectedStudy) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pt-32 pb-32 bg-white min-h-screen">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <button 
-            onClick={() => setSelectedStudy(null)}
-            className="flex items-center gap-2 text-sm font-bold text-text-muted hover:text-black transition-colors mb-12 group"
-          >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Work
-          </button>
-
-          <div className="relative h-[400px] md:h-[500px] w-full rounded-[2rem] overflow-hidden mb-16 border border-border mt-8">
-            <img src={selectedStudy.image} alt={selectedStudy.title} className="w-full h-full object-cover grayscale transition-all duration-1000 hover:grayscale-0" referrerPolicy="no-referrer" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute bottom-10 left-10 right-10">
-              <div className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider w-fit mb-4 border border-white/30">
-                {selectedStudy.category}
-              </div>
-              <h1 className="text-4xl md:text-6xl font-display font-extrabold text-white tracking-tighter">{selectedStudy.title}</h1>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-16">
-            <div className="md:col-span-2 space-y-12">
-              <section>
-                <h2 className="text-3xl font-display font-extrabold tracking-tighter mb-6 relative inline-block">
-                  The Challenge
-                  <div className="absolute -bottom-2 left-0 w-1/3 h-1 bg-black rounded-full" />
-                </h2>
-                <p className="text-lg text-text-muted leading-relaxed">{selectedStudy.challenge}</p>
-              </section>
-              
-              <section>
-                <h2 className="text-3xl font-display font-extrabold tracking-tighter mb-6 relative inline-block">
-                  Our Solution
-                  <div className="absolute -bottom-2 left-0 w-1/3 h-1 bg-black rounded-full" />
-                </h2>
-                <p className="text-lg text-text-muted leading-relaxed">{selectedStudy.solution}</p>
-              </section>
-              
-              <section>
-                <h2 className="text-3xl font-display font-extrabold tracking-tighter mb-6 relative inline-block">
-                  Key Results
-                  <div className="absolute -bottom-2 left-0 w-1/3 h-1 bg-black rounded-full" />
-                </h2>
-                <ul className="space-y-4">
-                  {selectedStudy.results.map((r: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-4">
-                      <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center text-white shrink-0 mt-1">
-                        <CheckCircle2 size={14} />
-                      </div>
-                      <span className="text-lg font-medium text-black">{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-
-            <div className="space-y-8">
-              <div className="bg-secondary p-8 rounded-3xl border border-border">
-                <h3 className="font-bold text-sm uppercase tracking-widest text-text-muted mb-4">Client Overview</h3>
-                <p className="text-xl font-bold text-black mb-1">{selectedStudy.client}</p>
-                <p className="text-sm font-medium text-text-muted">{selectedStudy.timeline} Engagement</p>
-              </div>
-
-              <div className="bg-secondary p-8 rounded-3xl border border-border">
-                <h3 className="font-bold text-sm uppercase tracking-widest text-text-muted mb-4">Tech Stack</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedStudy.tech.map((t: string) => (
-                    <span key={t} className="text-sm font-mono font-medium border border-border bg-white text-text-main px-3 py-1.5 rounded-lg">{t}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-black p-8 rounded-3xl text-white text-center">
-                <h3 className="font-display font-bold text-xl mb-4">Ready to scale your systems?</h3>
-                <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-white text-black w-full py-3 rounded-full font-bold inline-block hover:scale-105 transition-transform text-sm">
-                  Let's Talk
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-40 pb-32">
-      <div className="container mx-auto px-6">
-        <div className="mb-20 max-w-3xl">
-          <h1 className="text-6xl lg:text-8xl font-display font-extrabold tracking-tighter mb-8 text-black">Selected <br/><span className="text-text-muted italic">Work</span></h1>
-          <p className="text-xl text-text-muted leading-relaxed">Proof of work. Explore our real-world implementations across enterprise automation, AI, and scalable web infrastructure.</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence>
-            {CASE_STUDIES.map((proj, idx) => (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
-                key={proj.id} 
-                onClick={() => setSelectedStudy(proj)}
-                className="group cursor-pointer rounded-[2rem] border border-border overflow-hidden bg-secondary flex flex-col hover:border-black hover:shadow-2xl transition-all duration-500"
-              >
-                <div className="relative h-64 overflow-hidden border-b border-border">
-                  <img src={proj.image} alt={proj.title} className="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-105 group-hover:grayscale-0" referrerPolicy="no-referrer" />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-black text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                    {proj.category}
-                  </div>
-                </div>
-                <div className="p-8 flex flex-col flex-1">
-                  <h3 className="text-2xl font-bold mb-3 tracking-tight">{proj.title}</h3>
-                  <p className="text-text-muted text-sm mb-8 leading-relaxed line-clamp-3">{proj.desc}</p>
-                  <div className="mt-auto">
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {proj.tech.map(t => <span key={t} className="text-[10px] font-mono font-medium border border-border bg-white text-text-main px-2 py-1 rounded">{t}</span>)}
-                    </div>
-                    <button className="flex items-center gap-2 text-sm font-bold border-b border-black pb-1 w-fit group/btn">
-                      Read Case Study <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const AboutPage = () => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-40 pb-32">
-    <div className="container mx-auto px-6">
-      <div className="grid lg:grid-cols-2 gap-20 items-center mb-32">
-        <div>
-           <h1 className="text-6xl lg:text-8xl font-display font-extrabold tracking-tighter mb-10 text-black">Who <br /><span className="text-text-muted italic">We Are</span></h1>
-           <p className="text-2xl text-text-muted leading-relaxed mb-6 font-medium">
-             NexOra Labs is an elite engineering agency helping ambitious businesses unlock scale through cutting-edge technology.
-           </p>
-           <p className="text-lg text-text-muted leading-relaxed mb-12">
-             Founded in 2024, our mission is to build the digital infrastructure of tomorrow. We bring Silicon Valley-level execution to every project globally. We don't just stay ahead of the curve — we define it.
-           </p>
-           <div className="grid grid-cols-2 gap-8 border-t border-border pt-12">
-               <div>
-                   <div className="text-4xl font-display font-extrabold text-black mb-2">2024</div>
-                   <p className="text-xs text-text-muted font-bold uppercase tracking-widest">Founded</p>
-               </div>
-               <div>
-                   <div className="text-4xl font-display font-extrabold text-black mb-2">Remote</div>
-                   <p className="text-xs text-text-muted font-bold uppercase tracking-widest">Global HQ</p>
-               </div>
-           </div>
-        </div>
-        <div className="relative group perspective-1000">
-            <div className="preserve-3d transition-transform duration-700 hover:rotate-y-12">
-               <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="Team collaborating" className="rounded-[2rem] border border-border grayscale transition-all duration-700 object-cover aspect-[4/3] group-hover:grayscale-0 shadow-2xl" referrerPolicy="no-referrer" />
-               <div className="absolute -bottom-10 -left-10 bg-black p-8 rounded-3xl shadow-2xl hidden md:block border border-white/10 transform translate-z-[50px]">
-                   <div className="text-4xl font-display font-extrabold mb-2 text-white italic tracking-tight">"AI-First"</div>
-                   <p className="text-gray-400 font-mono text-xs uppercase tracking-widest leading-none">Our Core DNA</p>
-               </div>
-            </div>
-        </div>
-      </div>
-
-      <div className="">
-        <h2 className="text-4xl font-display font-extrabold tracking-tighter mb-20 text-center">Core Values</h2>
-        <div className="grid md:grid-cols-3 gap-16 text-center">
-            {[
-                { title: 'Obsessive Innovation', desc: 'We iterate on the bleeding edge of AI and web technologies to ensure you remain uncatchable.' },
-                { title: 'Transparent Partnership', desc: 'No smoke and mirrors. Clear communication, straightforward pricing, and honest advisory.' },
-                { title: 'Relentless Performance', desc: 'If a feature or line of code does not drive business growth, we do not build it.' },
-            ].map((v, i) => (
-                <div key={i} className="group border border-border p-10 rounded-[2rem] hover:border-black transition-colors hover:shadow-2xl">
-                    <div className="text-7xl font-display font-extrabold mb-8 text-gray-100 group-hover:text-black transition-colors">0{i+1}</div>
-                    <h4 className="text-2xl font-bold mb-4">{v.title}</h4>
-                    <p className="text-text-muted leading-relaxed">{v.desc}</p>
-                </div>
-            ))}
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
-
-const ContactPage = () => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-40 pb-32">
-    <div className="container mx-auto px-6 max-w-6xl">
-      <div className="text-center mb-20">
-        <h1 className="text-6xl lg:text-8xl font-display font-extrabold tracking-tighter mb-6 text-black">Let's <span className="text-text-muted italic">Talk</span></h1>
-        <p className="text-xl text-text-muted max-w-2xl mx-auto">Ready to build? Send us a message or reach out directly on WhatsApp for an immediate response.</p>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-16">
-        <div className="bg-secondary rounded-[2rem] border border-border p-8 lg:p-12 shadow-xl">
-          <form className="space-y-6" action="https://formspree.io/f/xyyllqll" method="POST">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-black uppercase tracking-wider">Name</label>
-                <input type="text" name="name" className="w-full bg-white border border-border rounded-xl px-4 py-4 focus:outline-none focus:border-black transition-colors" placeholder="John Doe" required />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-black uppercase tracking-wider">Email</label>
-                <input type="email" name="email" className="w-full bg-white border border-border rounded-xl px-4 py-4 focus:outline-none focus:border-black transition-colors" placeholder="john@company.com" required />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-black uppercase tracking-wider">Service Needed</label>
-              <select name="service" className="w-full bg-white border border-border rounded-xl px-4 py-4 focus:outline-none focus:border-black transition-colors">
-                <option>Web Development</option>
-                <option>Automation</option>
-                <option>AI Agents</option>
-                <option>Mobile App</option>
-                <option>Other / Consulting</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-black uppercase tracking-wider">Message</label>
-              <textarea name="message" rows={5} className="w-full bg-white border border-border rounded-xl px-4 py-4 focus:outline-none focus:border-black transition-colors resize-none" placeholder="Tell us about your project goals..." required></textarea>
-            </div>
-            <button type="submit" className="w-full bg-black text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform shadow-xl">
-              Send Message <Send size={18} />
-            </button>
-          </form>
-        </div>
-
-        <div className="flex flex-col justify-center space-y-12">
-          <div>
-            <h3 className="text-3xl font-display font-extrabold tracking-tighter mb-6">Direct Contact</h3>
-            <p className="text-lg text-text-muted mb-8 leading-relaxed">Prefer speaking directly? Our engineering consultants are available via WhatsApp.</p>
-            <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-4 bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/20 px-8 py-4 rounded-full font-bold hover:bg-[#25D366]/20 transition-colors shadow-sm">
-              <Phone size={24} /> Chat on WhatsApp
+const CallToAction = () => (
+  <section className="py-32 relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neon-purple/10"></div>
+    <div className="container mx-auto px-6 relative z-10">
+      <div className="glass-card rounded-[3rem] p-12 md:p-24 text-center max-w-5xl mx-auto border-white/10 shadow-[0_0_100px_rgba(139,92,246,0.15)] relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 to-transparent blur-2xl"></div>
+        <div className="relative z-10">
+            <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter">Ready to <br/><span className="text-neon-gradient">scale your operations?</span></h2>
+            <p className="text-xl text-text-muted mb-12 max-w-2xl mx-auto">Deploy software and AI agents that act fast, eliminate manual overhead, and integrate flawlessly into your existing ecosystem.</p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-white text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                Chat with an Engineer
             </a>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 shrink-0 bg-gray-100 rounded-xl flex items-center justify-center border border-border">
-                <Globe className="text-black" />
-              </div>
-              <div>
-                <h4 className="font-bold text-lg mb-1">Location</h4>
-                <p className="text-text-muted">Remote-First (HQ: Pakistan)<br />Serving USA, UK, EU, Gulf</p>
-              </div>
+            <button className="bg-white/5 border border-white/10 text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-white/10 transition-colors backdrop-blur-md">
+                View Documentation
+            </button>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 shrink-0 bg-gray-100 rounded-xl flex items-center justify-center border border-border">
-                <Clock className="text-black" />
-              </div>
-              <div>
-                <h4 className="font-bold text-lg mb-1">Business Hours</h4>
-                <p className="text-text-muted">Mon - Fri, 9:00 AM - 6:00 PM (PKT)</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
-  </motion.div>
+  </section>
 );
 
 const Footer = () => (
-  <footer className="bg-black text-white pt-24 pb-12 border-t border-white/10">
+  <footer className="bg-secondary pt-20 pb-10 border-t border-white/5 relative z-10">
     <div className="container mx-auto px-6">
-      <div className="grid md:grid-cols-4 gap-12 mb-16">
+      <div className="grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
         <div className="md:col-span-2">
-          <div className="text-2xl font-display font-extrabold tracking-tighter flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-black">
-              <Zap size={18} />
+          <div className="text-2xl font-display font-bold tracking-tighter mb-6 flex items-center gap-3">
+             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-neon-blue to-neon-purple p-[1px]">
+                <div className="w-full h-full bg-primary rounded-lg flex items-center justify-center">
+                <AudioLines size={14} className="text-white" />
+                </div>
             </div>
-            NexOra Labs
+            <span className="text-white">NexOra <span className="text-neon-cyan">labs</span></span>
           </div>
-          <p className="text-gray-400 max-w-sm leading-relaxed mb-8">Building tomorrow's digital infrastructure. Elite engineering for ambitious businesses.</p>
-          <div className="flex gap-4">
-            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-colors"><Linkedin size={18} /></a>
-            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-colors"><Github size={18} /></a>
-            <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-colors"><Instagram size={18} /></a>
-          </div>
+          <p className="text-text-muted leading-relaxed max-w-md">Engineering the standard for intelligent automation, artificial intelligence, and scalable web infrastructure.</p>
         </div>
+        
         <div>
-          <h4 className="font-bold mb-6 tracking-wide text-gray-200">Services</h4>
-          <ul className="space-y-4 text-gray-400">
-            <li><button className="hover:text-white transition-colors">Web Development</button></li>
-            <li><button className="hover:text-white transition-colors">AI Agents</button></li>
-            <li><button className="hover:text-white transition-colors">Automation</button></li>
-            <li><button className="hover:text-white transition-colors">Mobile Apps</button></li>
+          <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Services</h4>
+          <ul className="space-y-4 text-text-muted text-sm border-l border-white/5 pl-4">
+            <li><a href="#" className="hover:text-white transition-colors">AI Agents</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Workflow Automation</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Web Development</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Mobile Platforms</a></li>
           </ul>
         </div>
+        
         <div>
-          <h4 className="font-bold mb-6 tracking-wide text-gray-200">Contact</h4>
-          <ul className="space-y-4 text-gray-400">
-            <li><a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">{WHATSAPP_DISPLAY}</a></li>
-            <li><a href="mailto:hello@nexoralabs.com" className="hover:text-white transition-colors">hello@nexoralabs.com</a></li>
-            <li>Remote - Pakistan</li>
+          <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Connect</h4>
+          <ul className="space-y-4 text-text-muted text-sm border-l border-white/5 pl-4">
+            <li><a href={WHATSAPP_LINK} className="hover:text-neon-cyan transition-colors">WhatsApp</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Twitter (X)</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
           </ul>
         </div>
       </div>
-      <div className="pt-8 border-t border-white/10 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-        <p>&copy; {new Date().getFullYear()} NexOra Labs. All rights reserved.</p>
-        <div className="flex gap-4">
-          <button className="hover:text-white transition-colors">Privacy</button>
-          <button className="hover:text-white transition-colors">Terms</button>
+      <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-text-muted text-sm">
+        <p>© 2024 NexOra labs. All rights reserved.</p>
+        <div className="flex gap-6 mt-4 md:mt-0">
+          <a href="#" className="hover:text-white transition-colors">Privacy</a>
+          <a href="#" className="hover:text-white transition-colors">Terms</a>
         </div>
       </div>
     </div>
@@ -840,26 +514,58 @@ const Footer = () => (
 
 export default function App() {
   const [activePage, setActivePage] = useState('home');
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [activePage]);
+  const handleNavigate = (page: string) => {
+    if (page === activePage || isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActivePage(page);
+      setIsTransitioning(false);
+    }, 800); // Simulate AI processing delay for branded loader
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Navbar activePage={activePage} setActivePage={setActivePage} />
+    <div className="min-h-screen bg-primary">
+      <Navbar activePage={activePage} setActivePage={handleNavigate} />
       
-      <main className="flex-grow">
-        <AnimatePresence mode="wait">
-          {activePage === 'home' && <HomePage key="home" setActivePage={setActivePage} />}
-          {activePage === 'services' && <ServicesPage key="services" />}
-          {activePage === 'portfolio' && <PortfolioPage key="portfolio" />}
-          {activePage === 'about' && <AboutPage key="about" />}
-          {activePage === 'contact' && <ContactPage key="contact" />}
-        </AnimatePresence>
-      </main>
+      <AnimatePresence mode="wait">
+        {isTransitioning ? (
+          <PageLoader />
+        ) : (
+          <>
+            {activePage === 'home' && (
+              <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <HeroSection />
+                <FeaturesGrid />
+                <CaseStudiesSection />
+                <TestimonialsSection />
+                <CallToAction />
+              </motion.div>
+            )}
+            
+            {activePage === 'use_cases' && (
+              <motion.div key="use_cases" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="pt-20"><UseCasesScroll /></div>
+              </motion.div>
+            )}
 
+            {activePage === 'about' && (
+              <motion.div key="about" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-40 pb-32 min-h-[80vh] flex items-center relative overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-cyan glow-bg opacity-10"></div>
+                <div className="container mx-auto px-6 text-center max-w-4xl relative z-10">
+                    <h1 className="text-6xl md:text-8xl font-bold mb-8 tracking-tighter">The Team Behind <br/><span className="text-neon-gradient">The Engine.</span></h1>
+                    <p className="text-2xl text-text-muted leading-relaxed">We are advanced AI researchers and ML engineers obsessed with driving human-level latency in synthetic voice generation.</p>
+                </div>
+              </motion.div>
+            )}
+          </>
+        )}
+      </AnimatePresence>
+      
       <Footer />
+      <ChatWidget />
     </div>
   );
 }
